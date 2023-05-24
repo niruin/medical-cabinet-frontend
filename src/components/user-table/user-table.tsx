@@ -11,6 +11,8 @@ import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 
 import { useUser } from '../../services/user';
+import { ProfilePatch } from '../../services/user/types';
+import { ProfileResponseData } from '../../services/api';
 
 interface Column {
   id: 'id' | 'firstName' | 'middleName' | 'lastName' | 'email' | 'role';
@@ -21,30 +23,34 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: 'id', label: 'ID', minWidth: 80 },
-  { id: 'email', label: 'Email', minWidth: 180 },
-  { id: 'firstName', label: 'First Name', minWidth: 100 },
+  { id: 'id', label: 'ID', minWidth: 30 },
+  { id: 'email', label: 'Email', minWidth: 160 },
+  { id: 'firstName', label: 'First Name', minWidth: 90 },
   {
     id: 'middleName',
     label: 'Middle Name',
-    minWidth: 180,
+    minWidth: 160,
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
     id: 'lastName',
     label: 'Last Name',
-    minWidth: 180,
+    minWidth: 160,
     format: (value: number) => value.toLocaleString('en-US'),
   },
   {
     id: 'role',
     label: 'Role',
-    minWidth: 170,
+    minWidth: 180,
     format: (value: number) => value.toFixed(2),
   },
 ];
 
-export const UserTable = ({ openModal }: { openModal: () => void }) => {
+type Props = {
+  setProfileSelect: (profile: ProfilePatch, modalType: 'role' | 'profile') => void;
+};
+
+export const UserTable = ({ setProfileSelect }: Props) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -61,6 +67,23 @@ export const UserTable = ({ openModal }: { openModal: () => void }) => {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleSelectUser = (user: ProfileResponseData, modalType: 'role' | 'profile') => {
+    const profile: ProfilePatch = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      middleName: user.middleName,
+      lastName: user.lastName,
+      birthDate: user.birthDate,
+      height: user.height,
+      weight: user.weight,
+      gender: user.gender,
+      role: user.role,
+    };
+
+    setProfileSelect(profile, modalType);
   };
 
   return (
@@ -91,9 +114,18 @@ export const UserTable = ({ openModal }: { openModal: () => void }) => {
                       return (
                         <TableCell key={column.id} align={column.align}>
                           <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
-                            {value}{' '}
-                            <Button onClick={openModal} sx={{ fontSize: 10 }}>
-                              Редактировать
+                            <Box sx={{ width: 110 }}>{value}</Box>
+                            <Button
+                              onClick={() => handleSelectUser(row, 'profile')}
+                              sx={{ fontSize: 10 }}
+                            >
+                              Profile
+                            </Button>
+                            <Button
+                              onClick={() => handleSelectUser(row, 'role')}
+                              sx={{ fontSize: 10 }}
+                            >
+                              Role
                             </Button>
                           </Box>
                         </TableCell>

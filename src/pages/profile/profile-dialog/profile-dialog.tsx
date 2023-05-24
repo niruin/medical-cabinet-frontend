@@ -10,6 +10,7 @@ const initProfileForm = (profile: Nullable<ProfilePatch>): Nullable<ProfilePatch
   if (!profile) return null;
 
   return {
+    id: profile.id,
     email: profile.email,
     firstName: profile.firstName,
     middleName: profile.middleName,
@@ -42,11 +43,9 @@ export const ProfileDialog = ({ isOpenModal, onClose }: Props) => {
     getProfile();
   };
 
-  const handleChangeProfile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!profileForm) return null;
+  const handleChangeProfile = (name?: string, value?: string) => {
+    if (!profileForm || !name || !value) return null;
 
-    const name = e.target.name;
-    const value = e.target.value;
     setProfileForm({
       ...profileForm,
       [name]: value,

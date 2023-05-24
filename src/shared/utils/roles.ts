@@ -1,6 +1,6 @@
 export enum Roles {
-  DOCTOR = 'Врач',
-  PATIENT = 'Пользователь',
   USER = 'Пользователь',
+  PATIENT = 'Пациент',
+  DOCTOR = 'Врач',
   ADMIN = 'Администратор',
 }

@@ -1,10 +1,12 @@
 import globalAxios from 'axios';
 
-import { RolesApi, UsersApi } from './api';
+import {RolesApi, ScheduleApi, UsersApi, DoctorsApi} from './api';
 
 class Api {
   role: RolesApi = new RolesApi();
   user: UsersApi = new UsersApi();
+  doctors: DoctorsApi = new DoctorsApi();
+  schedule: ScheduleApi = new ScheduleApi();
 
   constructor() {
     this.setDefault();
