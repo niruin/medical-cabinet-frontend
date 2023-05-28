@@ -14,6 +14,8 @@ export * from './profile-response-data';
 export * from './roles-response';
 export * from './schedule';
 export * from './schedule-list-response';
+export * from './schedule-patient';
+export * from './schedule-person';
 export * from './schedule-remove-one-request';
 export * from './signup-response';
 export * from './signup-response-data';

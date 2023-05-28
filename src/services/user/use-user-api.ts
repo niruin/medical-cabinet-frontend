@@ -6,6 +6,13 @@ const getDoctorList = async () => {
   return data;
 };
 
+const getPatientList = async () => {
+  const { data } = await api.patients.patientsControllerList({ withCredentials: true });
+
+  return data;
+};
+
 export const useUserApi = () => ({
   getDoctorList,
+  getPatientList,
 });

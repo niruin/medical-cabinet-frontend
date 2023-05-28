@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { LoginUserResponseExampleData } from './login-user-response-example-data';
+import { SchedulePerson } from './schedule-person';
 
 /**
- * @type LoginUserResponseData
+ * @type SchedulePatient
  * @export
  */
-export type LoginUserResponseData = LoginUserResponseExampleData;
+export type SchedulePatient = SchedulePerson;

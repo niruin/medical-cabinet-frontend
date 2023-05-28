@@ -27,6 +27,8 @@ models/profile-response-data.ts
 models/profile-response.ts
 models/roles-response.ts
 models/schedule-list-response.ts
+models/schedule-patient.ts
+models/schedule-person.ts
 models/schedule-remove-one-request.ts
 models/schedule.ts
 models/signup-response-data.ts

@@ -13,16 +13,6 @@ type Props = {
   onChangePerson: (event: SelectChangeEvent) => void;
 };
 export const MultipleSelect = ({ list, person, onChangePerson }: Props) => {
-  // const [person, setPerson] = React.useState<Nullable<Doctor>>(null);
-
-  // const handleChange = (event: SelectChangeEvent) => {
-  //   const {
-  //     target: { value },
-  //   } = event;
-  //   const doctor = list.find((item) => item.id === value) || null;
-  //   setPerson(doctor);
-  // };
-
   return (
     <div>
       <FormControl sx={{ m: 1, width: 300 }}>

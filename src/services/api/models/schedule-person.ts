@@ -12,32 +12,28 @@
  * Do not edit the class manually.
  */
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { ProfileResponseData } from './profile-response-data';
-
 /**
  *
  * @export
- * @interface UsersAllResponse
+ * @interface SchedulePerson
  */
-export interface UsersAllResponse {
+export interface SchedulePerson {
   /**
    *
    * @type {string}
-   * @memberof UsersAllResponse
+   * @memberof SchedulePerson
    */
-  status: string;
+  firstName: string;
   /**
    *
    * @type {string}
-   * @memberof UsersAllResponse
+   * @memberof SchedulePerson
    */
-  message: string;
+  middleName: string;
   /**
    *
-   * @type {Array<ProfileResponseData>}
-   * @memberof UsersAllResponse
+   * @type {string}
+   * @memberof SchedulePerson
    */
-  data: Array<ProfileResponseData>;
+  lastName: string;
 }

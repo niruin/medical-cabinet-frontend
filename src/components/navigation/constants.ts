@@ -22,7 +22,7 @@ export const tabItems: TabItem[] = [
     title: 'Расписание врача',
     link: '/schedule',
     icon: DateRangeIcon,
-    permittedRoles: [Roles.DOCTOR, Roles.USER, Roles.PATIENT],
+    permittedRoles: [Roles.DOCTOR, Roles.USER, Roles.PATIENT, Roles.ADMIN],
   },
   {
     title: 'Пользователи',

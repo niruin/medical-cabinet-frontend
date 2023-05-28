@@ -11,6 +11,7 @@ import { Doctor } from '../../services/api';
 export const Schedule = () => {
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
   const [person, setPerson] = React.useState<Nullable<Doctor>>(null);
+
   const { getDoctorList } = useUserApi();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export const Schedule = () => {
   return (
     <Container>
       <MultipleSelect list={doctorList} person={person} onChangePerson={handleChange} />
-      <DateScheduler doctorId={person?.id || null} />
+      {person && <DateScheduler doctor={person} />}
     </Container>
   );
 };

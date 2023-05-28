@@ -38,8 +38,6 @@ export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
   const handleSubmit = () => {
     if (!profileForm) return null;
 
-    console.log('submit', profileForm);
-
     updateProfile(profileForm, onSuccessCallback, profile.id);
     onClose();
   };

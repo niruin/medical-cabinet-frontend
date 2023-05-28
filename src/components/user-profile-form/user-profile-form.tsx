@@ -1,4 +1,4 @@
-import { SelectChangeEvent, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 import React from 'react';
 
 import { StyledBoxForm } from './ui';
@@ -10,8 +10,6 @@ export const UserProfileForm = ({ profile, modeAdmin = false, onChange }: UserPr
   const { email, firstName, middleName, lastName, birthDate, height, weight, gender, role } =
     profile;
 
-  console.log(profile);
-
   function getValue(value: any) {
     if (disabled) {
       return value || '-';
@@ -21,12 +19,6 @@ export const UserProfileForm = ({ profile, modeAdmin = false, onChange }: UserPr
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    if (onChange) onChange(name, value);
-  };
-
-  const handleSelect = (e: SelectChangeEvent) => {
     const name = e.target.name;
     const value = e.target.value;
     if (onChange) onChange(name, value);
