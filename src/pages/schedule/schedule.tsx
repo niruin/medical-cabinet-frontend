@@ -11,8 +11,9 @@ import { Doctor } from '../../services/api';
 export const Schedule = () => {
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
   const [person, setPerson] = React.useState<Nullable<Doctor>>(null);
-
   const { getDoctorList } = useUserApi();
+
+  const [forceUpdate, setForceUpdate] = useState(false);
 
   useEffect(() => {
     getDoctorList().then((data) => {
@@ -20,6 +21,14 @@ export const Schedule = () => {
       setDoctorList(list);
     });
   }, []);
+
+  useEffect(() => {
+    setForceUpdate(false);
+  }, [person]);
+
+  useEffect(() => {
+    if (!forceUpdate) setForceUpdate(true);
+  }, [forceUpdate]);
 
   const handleChange = (event: SelectChangeEvent) => {
     const {
@@ -32,7 +41,8 @@ export const Schedule = () => {
   return (
     <Container>
       <MultipleSelect list={doctorList} person={person} onChangePerson={handleChange} />
-      {person && <DateScheduler doctor={person} />}
+      {person && forceUpdate && <DateScheduler doctor={person} />}
+      {person && !forceUpdate && <DateScheduler />}
     </Container>
   );
 };

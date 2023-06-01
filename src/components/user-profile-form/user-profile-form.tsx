@@ -1,22 +1,27 @@
-import { TextField } from '@mui/material';
+import { InputLabel, MenuItem, TextField } from '@mui/material';
 import React from 'react';
+import { Dayjs } from 'dayjs';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
 
-import { StyledBoxForm } from './ui';
 import { UserProfileProps } from './types';
+import { StyledBoxForm } from './ui';
+import { BirthDatePicker } from './datepicker';
 
-export const UserProfileForm = ({ profile, modeAdmin = false, onChange }: UserProfileProps) => {
+export const UserProfileForm = ({ profile, onChange }: UserProfileProps) => {
   const disabled = !onChange;
 
-  const { email, firstName, middleName, lastName, birthDate, height, weight, gender, role } =
-    profile;
+  const { email, firstName, middleName, lastName, birthDate, height, weight, gender } = profile;
 
-  function getValue(value: any) {
-    if (disabled) {
-      return value || '-';
-    }
+  const handleChangeDate = (e: Dayjs | null) => {
+    const name = 'birthDate';
+    if (onChange) onChange(name, e?.toISOString());
+  };
 
-    return value || '';
-  }
+  const handleSelect = (e: SelectChangeEvent) => {
+    const name = 'gender';
+    if (onChange) onChange(name, e.target.value);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
@@ -33,90 +38,79 @@ export const UserProfileForm = ({ profile, modeAdmin = false, onChange }: UserPr
         disabled={disabled}
         onChange={handleChange}
         name="email"
-        value={getValue(email)}
+        value={email || ''}
+        sx={{ color: 'red!important' }}
       />
       <TextField
         id="firstName"
-        label="firstName"
+        label="Имя"
         size="small"
         disabled={disabled}
         onChange={handleChange}
         name="firstName"
-        value={getValue(firstName)}
+        value={firstName || ''}
       />
       <TextField
         id="middleName"
-        label="middleName"
+        label="Отчество"
         size="small"
         disabled={disabled}
         onChange={handleChange}
         name="middleName"
-        value={getValue(middleName)}
+        value={middleName || ''}
       />
       <TextField
         id="lastName"
-        label="lastName"
+        label="Фамилия"
         size="small"
         disabled={disabled}
         onChange={handleChange}
         name="lastName"
-        value={getValue(lastName)}
+        value={lastName || ''}
       />
-      <TextField
-        id="birthDate"
-        label="birthDate"
-        size="small"
+      <BirthDatePicker
+        birthDate={birthDate}
         disabled={disabled}
-        onChange={handleChange}
-        name="birthDate"
-        value={getValue(birthDate)}
+        handleChangeDate={handleChangeDate}
       />
+      <FormControl fullWidth>
+        <InputLabel id="gender" size="small">
+          Пол
+        </InputLabel>
+        <Select
+          labelId="gender"
+          id="gender"
+          name="gender"
+          value={gender || ''}
+          label="gender"
+          size="small"
+          onChange={handleSelect}
+          disabled={disabled}
+        >
+          <MenuItem value="Мужской">Мужской</MenuItem>
+          <MenuItem value="Женский">Женский</MenuItem>
+        </Select>
+      </FormControl>
       <TextField
         id="height"
-        label="height"
+        label="Рост"
         size="small"
         disabled={disabled}
         onChange={handleChange}
         name="height"
-        value={getValue(height)}
+        value={height || ''}
+        type="number"
       />
       <TextField
         id="weight"
-        label="weight"
+        label="Вес"
         size="small"
         disabled={disabled}
         onChange={handleChange}
         name="weight"
-        value={getValue(weight)}
+        value={weight || ''}
+        type="number"
       />
-      <TextField
-        id="gender"
-        label="gender"
-        size="small"
-        disabled={disabled}
-        onChange={handleChange}
-        name="gender"
-        value={getValue(gender)}
-      />
-      {/*{modeAdmin && (*/}
-      {/*  <FormControl fullWidth>*/}
-      {/*    <InputLabel id="demo-simple-select-label">Age</InputLabel>*/}
-      {/*    <Select*/}
-      {/*      labelId="role"*/}
-      {/*      id="role"*/}
-      {/*      name="role"*/}
-      {/*      value={getValue(role)}*/}
-      {/*      label="Role"*/}
-      {/*      size="small"*/}
-      {/*      onChange={handleSelect}*/}
-      {/*    >*/}
-      {/*      <MenuItem value={Roles.USER}>{Roles.USER}</MenuItem>*/}
-      {/*      <MenuItem value={Roles.PATIENT}>{Roles.PATIENT}</MenuItem>*/}
-      {/*      <MenuItem value={Roles.DOCTOR}>{Roles.DOCTOR}</MenuItem>*/}
-      {/*      <MenuItem value={Roles.ADMIN}>{Roles.ADMIN}</MenuItem>*/}
-      {/*    </Select>*/}
-      {/*  </FormControl>*/}
-      {/*)}*/}
     </StyledBoxForm>
   );
 };

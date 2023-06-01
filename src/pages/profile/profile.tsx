@@ -1,9 +1,9 @@
 import { Box, Button, Container } from '@mui/material';
 import React, { useState } from 'react';
 
-import { UserProfileForm } from '../../components/user-profile-form';
 import { useUser } from '../../services/user';
 import { ProfileDialog } from './profile-dialog';
+import { ProfileReview } from './profile-review';
 
 export const Profile = () => {
   const { profile } = useUser();
@@ -20,9 +20,17 @@ export const Profile = () => {
   if (!profile) return null;
 
   return (
-    <Container>
-      <UserProfileForm profile={profile} />
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, padding: '0 8px' }}>
+    <Container
+      sx={{
+        display: 'flex',
+        gap: 2,
+        flexDirection: 'column',
+        maxWidth: '720px!important',
+        margin: 'auto',
+      }}
+    >
+      <ProfileReview profile={profile} />
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
         <Button onClick={handleOpenModal} variant="contained">
           Редактировать
         </Button>

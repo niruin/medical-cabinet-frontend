@@ -70,4 +70,16 @@ export interface Schedule {
    * @memberof Schedule
    */
   doctor: SchedulePatient;
+  /**
+   *
+   * @type {boolean}
+   * @memberof Schedule
+   */
+  editable: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof Schedule
+   */
+  disabled: boolean;
 }

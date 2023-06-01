@@ -56,7 +56,7 @@ export const RoleDialog = ({ selectUserId, currentRole, isOpenModal, onClose }: 
       <DialogTitle>Сменить Роль</DialogTitle>
       <DialogContent>
         <FormControl fullWidth sx={{ mt: 1 }}>
-          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+          <InputLabel id="demo-simple-select-label">Роль</InputLabel>
           <Select
             labelId="role"
             id="role"

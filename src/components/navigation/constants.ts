@@ -12,12 +12,6 @@ export const tabItems: TabItem[] = [
     icon: AccountCircleIcon,
     permittedRoles: Object.values(Roles),
   },
-  // {
-  //   title: 'Приемы',
-  //   link: '/visits',
-  //   icon: RestoreIcon,
-  //   permittedRoles: [Roles.USER, Roles.PATIENT],
-  // },
   {
     title: 'Расписание врача',
     link: '/schedule',

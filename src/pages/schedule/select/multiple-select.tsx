@@ -16,13 +16,13 @@ export const MultipleSelect = ({ list, person, onChangePerson }: Props) => {
   return (
     <div>
       <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-name-label">Name</InputLabel>
+        <InputLabel id="demo-multiple-name-label">Доктор</InputLabel>
         <Select
           labelId="demo-multiple-name-label"
           id="demo-multiple-name"
           value={person?.id || ''}
           onChange={onChangePerson}
-          input={<OutlinedInput label="Name" />}
+          input={<OutlinedInput label="Doctor" />}
         >
           {list.map(({ id, firstName, middleName, lastName }) => (
             <MenuItem key={id} value={id}>

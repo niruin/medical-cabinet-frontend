@@ -2,32 +2,39 @@ import { Scheduler } from '@aldabil/react-scheduler';
 import { ProcessedEvent, ViewEvent } from '@aldabil/react-scheduler/types';
 import { WeekProps } from '@aldabil/react-scheduler/views/Week';
 import { ru } from 'date-fns/locale';
+import { enqueueSnackbar } from 'notistack';
 
 import { useScheduleService } from '../../services/schedule';
 import { Doctor } from '../../services/api';
 import { CustomEditor } from './custom-editor';
 
 type Props = {
-  doctor: Doctor;
+  doctor?: Doctor;
 };
 
 export const DateScheduler = ({ doctor }: Props) => {
-  const { getEvents } = useScheduleService();
-  if (!doctor?.id) {
-    return <div>Доктор не выбран</div>;
-  }
+  const { getEvents, deleteEvent } = useScheduleService();
 
   const fetchRemote = async (query: ViewEvent): Promise<ProcessedEvent[]> => {
+    if (!doctor?.id) return [];
+
     return new Promise((res) => {
-      getEvents(doctor.id).then((data) => res(data));
+      getEvents(doctor.id).then((data) => {
+        return res(data);
+      });
     });
   };
 
   const handleDelete = async (deletedId: string): Promise<string> => {
     return new Promise((res, rej) => {
-      setTimeout(() => {
-        res(deletedId);
-      }, 300);
+      deleteEvent(deletedId)
+        .then((data) => {
+          res(deletedId);
+        })
+        .catch((error) => {
+          rej(error);
+          enqueueSnackbar('Не удалось создать заявку', { variant: 'error' });
+        });
     });
   };
 
@@ -53,7 +60,11 @@ export const DateScheduler = ({ doctor }: Props) => {
       month={null}
       hourFormat="24"
       locale={ru}
-      customEditor={(scheduler) => <CustomEditor scheduler={scheduler} doctor={doctor} />}
+      customEditor={(scheduler) => {
+        if (!doctor?.id) return <div />;
+
+        return <CustomEditor scheduler={scheduler} doctor={doctor} />;
+      }}
       draggable={false}
     />
   );

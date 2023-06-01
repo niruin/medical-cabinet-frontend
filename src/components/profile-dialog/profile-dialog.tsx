@@ -5,7 +5,6 @@ import { enqueueSnackbar, VariantType } from 'notistack';
 import { ProfilePatch } from '../../services/user/types';
 import { useUser } from '../../services/user';
 import { UserProfileForm } from '../user-profile-form';
-import { Roles } from '../../shared/utils/roles';
 
 type Props = {
   profile: ProfilePatch;
@@ -14,7 +13,7 @@ type Props = {
 };
 
 export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
-  const { updateProfile, allUsers, profile: currentUser } = useUser();
+  const { updateProfile, allUsers } = useUser();
   const [profileForm, setProfileForm] = useState<ProfilePatch>(profile);
 
   useEffect(() => {
@@ -48,11 +47,7 @@ export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
     <Dialog open={isOpenModal} onClose={onClose}>
       <DialogTitle>Редактирование</DialogTitle>
       <DialogContent>
-        <UserProfileForm
-          profile={profileForm}
-          modeAdmin={currentUser?.role === Roles.ADMIN}
-          onChange={handleChangeProfile}
-        />
+        <UserProfileForm profile={profileForm} onChange={handleChangeProfile} />
       </DialogContent>
       <DialogActions
         sx={{

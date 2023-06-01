@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { TextField, Button, DialogActions, Box } from '@mui/material';
 import type { ProcessedEvent, SchedulerHelpers } from '@aldabil/react-scheduler/types';
-import { format } from 'date-fns';
 import { enqueueSnackbar } from 'notistack';
+import dayjs from 'dayjs';
 
-import { CreateScheduleDto, Doctor } from '../../../services/api';
+import { ChangeScheduleDto, CreateScheduleDto, Doctor } from '../../../services/api';
 import { useScheduleService } from '../../../services/schedule';
 import { useUser } from '../../../services/user';
 import { Roles } from '../../../shared/utils/roles';
+import { StyledWrapper } from './ui';
 
 interface CustomEditorProps {
   scheduler: SchedulerHelpers;
@@ -16,7 +17,7 @@ interface CustomEditorProps {
 export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
   const eventMain = scheduler.edited;
   const { start, end } = scheduler.state;
-  const { createEvent } = useScheduleService();
+  const { createEvent, updateEvent } = useScheduleService();
   const { profile } = useUser();
 
   if (!profile?.id) {
@@ -37,8 +38,8 @@ export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
   }
 
   const [state, setState] = useState({
+    event_id: eventMain?.event_id || null,
     title: eventMain?.title || `${profile.firstName} ${profile.lastName}`,
-    description: eventMain?.description || '',
     doctor: eventMain?.doctor.lastName || `${doctor.firstName} ${doctor.lastName}`,
     comments: eventMain?.comments || '',
     diagnosis: eventMain?.diagnosis || '',
@@ -58,19 +59,19 @@ export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
     try {
       scheduler.loading(true);
 
-      const added_updated_event = (await new Promise((res) => {
+      const added_updated_event = (await new Promise((res, rej) => {
         if (eventMain) {
-          /** edit */
-        } else if (!eventMain) {
-          const payload: CreateScheduleDto = {
+          const payload: ChangeScheduleDto = {
+            id: Number(state.event_id),
             userId: profile?.id,
             startDate: start.value,
             endDate: end.value,
             doctorId: Number(doctor.id),
+            diagnosis: state.diagnosis,
+            comments: state.comments,
           };
-          createEvent(payload)
+          updateEvent(payload)
             .then((resp) => {
-              console.log(resp);
               const {
                 comments,
                 diagnosis,
@@ -92,7 +93,42 @@ export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
                 diagnosis,
               });
             })
-            .catch(() => {
+            .catch((error) => {
+              rej(error);
+              enqueueSnackbar('Не удалось создать заявку', { variant: 'error' });
+            });
+        } else if (!eventMain) {
+          const payload: CreateScheduleDto = {
+            userId: profile?.id,
+            startDate: start.value,
+            endDate: end.value,
+            doctorId: Number(doctor.id),
+          };
+          createEvent(payload)
+            .then((resp) => {
+              const {
+                comments,
+                diagnosis,
+                doctor: doctorObj,
+                endDate,
+                patient,
+                event_id,
+                startDate,
+                title,
+              } = resp.data;
+              res({
+                event_id,
+                title,
+                start: new Date(startDate),
+                end: new Date(endDate),
+                patient: patient,
+                doctor: doctorObj,
+                comments,
+                diagnosis,
+              });
+            })
+            .catch((error) => {
+              rej(error);
               enqueueSnackbar('Не удалось создать заявку', { variant: 'error' });
             });
         }
@@ -105,43 +141,37 @@ export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
     }
   };
 
-  const isExtraFields = profile.role === Roles.DOCTOR || profile.role === Roles.ADMIN;
+  const isNotPatient = profile.role === Roles.DOCTOR || profile.role === Roles.ADMIN;
 
   return (
     <div>
-      <Box sx={{ padding: 3, display: 'flex', gap: 2, flexDirection: 'column' }}>
-        <h2>Новая заявка</h2>
-        <TextField
-          label="Patient"
-          value={state.title}
-          onChange={(e) => handleChange(e.target.value, 'patient')}
-          disabled={true}
-          fullWidth
-        />
-        <TextField
-          label="Doctor"
-          value={state.doctor}
-          onChange={(e) => handleChange(e.target.value, 'doctor')}
-          disabled={true}
-          fullWidth
-        />
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            label="Start"
-            value={format(state.start.value, 'yyyy-MM-dd HH:mm')}
-            onChange={(e) => handleChange(e.target.value, 'startDate')}
-            disabled={true}
-            fullWidth
-          />
-          <TextField
-            label="End"
-            value={format(state.end.value, 'yyyy-MM-dd HH:mm')}
-            onChange={(e) => handleChange(e.target.value, 'endDate')}
-            disabled={true}
-            fullWidth
-          />
+      <StyledWrapper>
+        <Box className="title">{state.event_id ? 'Карточка приема' : 'Новая карточка'}</Box>
+        <Box className="box-item">
+          <Box>Пациент</Box>
+          <Box className="box-item__value">{state.title}</Box>
         </Box>
-        {isExtraFields && (
+
+        <Box className="box-item">
+          <Box>Доктор</Box>
+          <Box className="box-item__value">{state.doctor}</Box>
+        </Box>
+        <Box className="box-item">
+          <Box>Прием</Box>
+          <Box>
+            <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <span className="text-sm">От:</span>
+              <span className="text-me">{dayjs(state.start.value).format('M/D/YYYY')}</span>
+              <span className="text-bold">{dayjs(state.start.value).format('HH:MM')}</span>
+            </Box>
+            <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <span className="text-sm">От:</span>
+              <span className="text-me">{dayjs(state.end.value).format('M/D/YYYY')}</span>
+              <span className="text-bold">{dayjs(state.end.value).format('HH:MM')}</span>
+            </Box>
+          </Box>
+        </Box>
+        {isNotPatient ? (
           <>
             <TextField
               label="Diagnosis"
@@ -156,11 +186,38 @@ export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
               fullWidth
             />
           </>
+        ) : (
+          <>
+            {state.diagnosis && (
+              <Box className="box-item">
+                <Box>Диагноз</Box>
+                <Box className="box-item__value">{state.diagnosis}</Box>
+              </Box>
+            )}
+
+            {state.comments && (
+              <Box className="box-item">
+                <Box>Комментарий</Box>
+                <Box className="box-item__value">{state.comments}</Box>
+              </Box>
+            )}
+          </>
         )}
-      </Box>
-      <DialogActions>
-        <Button onClick={scheduler.close}>Cancel</Button>
-        <Button onClick={handleSubmit}>Confirm</Button>
+      </StyledWrapper>
+      <DialogActions sx={{ p: '12px 22px' }}>
+        <Button onClick={scheduler.close} variant="outlined">
+          {state.event_id ? 'Закрыть' : 'Отмена'}
+        </Button>
+        {!state.event_id && (
+          <Button onClick={handleSubmit} variant="contained" color="success">
+            {isNotPatient ? 'Сохранить' : 'Создать'}
+          </Button>
+        )}
+        {state.event_id && isNotPatient && (
+          <Button onClick={handleSubmit} variant="contained" color="success">
+            Сохранить
+          </Button>
+        )}
       </DialogActions>
     </div>
   );

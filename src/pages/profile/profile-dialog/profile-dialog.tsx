@@ -44,7 +44,7 @@ export const ProfileDialog = ({ isOpenModal, onClose }: Props) => {
   };
 
   const handleChangeProfile = (name?: string, value?: string) => {
-    if (!profileForm || !name || !value) return null;
+    if (!profileForm || !name) return null;
 
     setProfileForm({
       ...profileForm,
