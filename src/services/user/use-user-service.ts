@@ -4,6 +4,7 @@ import { VariantType } from 'notistack';
 import { api } from '../api/api-adapter';
 import { ChangeRoleUserDto, ProfileResponseData } from '../api';
 import { ProfilePatch } from './types';
+import { useAuthService } from '../auth/use-auth-service';
 
 export type UserService = {
   getProfile: () => void;
@@ -16,6 +17,7 @@ export type UserService = {
     data: ChangeRoleUserDto,
     onSuccess: (msg: string, status: VariantType) => void,
   ) => void;
+  removeById: (id: number) => void;
   allUsers: () => void;
   profile: Nullable<ProfileResponseData>;
   isLoading: boolean;
@@ -26,11 +28,12 @@ export const useUserService = (): UserService => {
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<null | ProfileResponseData>(null);
   const [users, setUsers] = useState<ProfileResponseData[]>([]);
+  const { logout } = useAuthService();
 
   const getProfile = async () => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerGetProfile({ withCredentials: true });
+    const { data } = await api.user.usersControllerGetProfile();
     setProfile(data.data);
     setIsLoading(false);
   };
@@ -42,19 +45,32 @@ export const useUserService = (): UserService => {
   ) => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerUpdate(
-      { userChangeRequest: payload, userIdToEdit: String(userIdToEdit) },
-      { withCredentials: true },
-    );
+    const { data } = await api.user.usersControllerUpdate({
+      userChangeRequest: payload,
+      userIdToEdit: String(userIdToEdit),
+    });
     setIsLoading(false);
     onSuccess('Профиль обновлен', 'success');
   };
 
   const allUsers = async () => {
     setIsLoading(true);
-    const { data } = await api.user.usersControllerGetUsersAll({ withCredentials: true });
+    const { data } = await api.user.usersControllerGetUsersAll();
     setUsers(data.data);
     setIsLoading(false);
+  };
+
+  const removeById = async (id: number) => {
+    setIsLoading(true);
+
+    const { data } = await api.user.usersControllerRemove({ deleteUserDto: { id } });
+    setIsLoading(false);
+
+    if (profile?.id === id) {
+      logout();
+    } else {
+      allUsers();
+    }
   };
 
   const changeRole = async (
@@ -62,10 +78,7 @@ export const useUserService = (): UserService => {
     onSuccess: (msg: string, status: VariantType) => void,
   ) => {
     setIsLoading(true);
-    const { data } = await api.user.usersControllerChangeRole(
-      { changeRoleUserDto: payload },
-      { withCredentials: true },
-    );
+    const { data } = await api.user.usersControllerChangeRole({ changeRoleUserDto: payload });
     setIsLoading(false);
     onSuccess('Профиль обновлен', 'success');
   };
@@ -73,6 +86,7 @@ export const useUserService = (): UserService => {
   return {
     getProfile,
     updateProfile,
+    removeById,
     changeRole,
     allUsers,
     isLoading,

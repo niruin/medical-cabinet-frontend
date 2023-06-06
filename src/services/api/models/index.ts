@@ -2,6 +2,7 @@ export * from './change-role-user-dto';
 export * from './change-schedule-dto';
 export * from './create-schedule-dto';
 export * from './create-user-dto';
+export * from './delete-user-dto';
 export * from './doctor';
 export * from './doctor-list-response';
 export * from './login-user-request';

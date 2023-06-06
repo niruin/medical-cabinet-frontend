@@ -10,9 +10,10 @@ import { CustomEditor } from './custom-editor';
 
 type Props = {
   doctor?: Doctor;
+  reRender: (value: boolean) => void;
 };
 
-export const DateScheduler = ({ doctor }: Props) => {
+export const DateScheduler = ({ doctor, reRender }: Props) => {
   const { getEvents, deleteEvent } = useScheduleService();
 
   const fetchRemote = async (query: ViewEvent): Promise<ProcessedEvent[]> => {
@@ -63,7 +64,7 @@ export const DateScheduler = ({ doctor }: Props) => {
       customEditor={(scheduler) => {
         if (!doctor?.id) return <div />;
 
-        return <CustomEditor scheduler={scheduler} doctor={doctor} />;
+        return <CustomEditor scheduler={scheduler} doctor={doctor} reRender={reRender} />;
       }}
       draggable={false}
     />

@@ -15,6 +15,7 @@ models/change-role-user-dto.ts
 models/change-schedule-dto.ts
 models/create-schedule-dto.ts
 models/create-user-dto.ts
+models/delete-user-dto.ts
 models/doctor-list-response.ts
 models/doctor.ts
 models/index.ts

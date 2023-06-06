@@ -13,7 +13,7 @@ type Props = {
 };
 
 export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
-  const { updateProfile, allUsers } = useUser();
+  const { updateProfile, allUsers, removeById } = useUser();
   const [profileForm, setProfileForm] = useState<ProfilePatch>(profile);
 
   useEffect(() => {
@@ -41,6 +41,11 @@ export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
     onClose();
   };
 
+  const handleRemove = () => {
+    onClose();
+    removeById(profileForm.id);
+  };
+
   if (!profileForm) return null;
 
   return (
@@ -63,6 +68,9 @@ export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
         </Button>
         <Button onClick={onClose} variant="contained">
           Отмена
+        </Button>
+        <Button onClick={handleRemove} variant="contained" color="error">
+          Удалить
         </Button>
       </DialogActions>
     </Dialog>
