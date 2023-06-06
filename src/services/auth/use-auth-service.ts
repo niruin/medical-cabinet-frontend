@@ -15,7 +15,7 @@ export type AuthService = {
   ) => void;
   isLoading: boolean;
   isLoggedIn: boolean;
-  logout: (onSuccess: (msg: string, status: VariantType) => void) => void;
+  logout: (onSuccess?: (msg: string, status: VariantType) => void) => void;
 };
 
 export const useAuthService = () => {
@@ -29,10 +29,11 @@ export const useAuthService = () => {
   ) => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerLogin(
-      { loginUserRequest: payload },
-      { withCredentials: true },
-    );
+    const { data } = await api.user
+      .usersControllerLogin({ loginUserRequest: payload })
+      .catch((e) => e);
+
+    setIsLoading(false);
 
     if (data?.data?.userId) {
       setIsLoggedIn(true);
@@ -40,8 +41,6 @@ export const useAuthService = () => {
     } else {
       onSuccess('Не удалось авторизоваться', 'error');
     }
-
-    setIsLoading(false);
   };
 
   const registration = async (
@@ -50,10 +49,7 @@ export const useAuthService = () => {
   ) => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerCreateUser(
-      { createUserDto: { ...payload } },
-      { withCredentials: true },
-    );
+    const { data } = await api.user.usersControllerCreateUser({ createUserDto: { ...payload } });
 
     if (data?.data?.userId) {
       onSuccess('Вы успешно зарегистрированы', 'success');
@@ -64,11 +60,16 @@ export const useAuthService = () => {
     setIsLoading(false);
   };
 
-  const logout = async (onSuccess: (msg: string, status: VariantType) => void) => {
+  const logout = async (onSuccess?: (msg: string, status: VariantType) => void) => {
     const { data } = await api.user.usersControllerLogout();
     setIsLoggedIn(false);
     deleteCookie();
-    onSuccess('Вы вышли из системы', 'success');
+
+    if (onSuccess) {
+      onSuccess('Вы вышли из системы', 'success');
+    }
+
+    window.location.reload();
   };
 
   return {

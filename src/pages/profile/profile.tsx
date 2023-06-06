@@ -6,7 +6,7 @@ import { ProfileDialog } from './profile-dialog';
 import { ProfileReview } from './profile-review';
 
 export const Profile = () => {
-  const { profile } = useUser();
+  const { profile, removeById } = useUser();
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const handleOpenModal = () => {
@@ -19,6 +19,10 @@ export const Profile = () => {
 
   if (!profile) return null;
 
+  const handleRemove = () => {
+    removeById(profile.id);
+  };
+
   return (
     <Container
       sx={{
@@ -30,9 +34,12 @@ export const Profile = () => {
       }}
     >
       <ProfileReview profile={profile} />
-      <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 2 }}>
         <Button onClick={handleOpenModal} variant="contained">
           Редактировать
+        </Button>
+        <Button onClick={handleRemove} variant="contained" color="error">
+          Удалить
         </Button>
       </Box>
       <ProfileDialog isOpenModal={isOpenModal} onClose={handleCloseModal} />

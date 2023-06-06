@@ -14,12 +14,12 @@ class Api {
   }
 
   private logout = () => {
-    location.reload();
+    // location.reload();
   };
 
   private setDefault = () => {
     globalAxios.interceptors.request.use((config) => {
-      return config;
+      return { ...config, withCredentials: true };
     });
 
     globalAxios.interceptors.response.use(

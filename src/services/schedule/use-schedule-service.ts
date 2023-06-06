@@ -12,10 +12,7 @@ type ScheduleService = {
 
 export const useScheduleService = (): ScheduleService => {
   const getEvents = async (id: string) => {
-    const data = await api.schedule.scheduleControllerList(
-      { doctorId: id },
-      { withCredentials: true },
-    );
+    const data = await api.schedule.scheduleControllerList({ doctorId: id });
 
     return data.data.data.map((item) => {
       const event: ProcessedEvent = {
@@ -36,28 +33,21 @@ export const useScheduleService = (): ScheduleService => {
   };
 
   const createEvent = async (payload: CreateScheduleDto) => {
-    const { data } = await api.schedule.scheduleControllerCreate(
-      { createScheduleDto: payload },
-      { withCredentials: true },
-    );
+    const { data } = await api.schedule.scheduleControllerCreate({ createScheduleDto: payload });
 
     return data;
   };
 
   const updateEvent = async (payload: ChangeScheduleDto) => {
-    const { data } = await api.schedule.scheduleControllerUpdate(
-      { changeScheduleDto: payload },
-      { withCredentials: true },
-    );
+    const { data } = await api.schedule.scheduleControllerUpdate({ changeScheduleDto: payload });
 
     return data;
   };
 
   const deleteEvent = async (id: string) => {
-    const { data } = await api.schedule.scheduleControllerRemove(
-      { scheduleRemoveOneRequest: { id } },
-      { withCredentials: true },
-    );
+    const { data } = await api.schedule.scheduleControllerRemove({
+      scheduleRemoveOneRequest: { id },
+    });
 
     return data;
   };

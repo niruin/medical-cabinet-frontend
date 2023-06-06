@@ -13,8 +13,9 @@ import { StyledWrapper } from './ui';
 interface CustomEditorProps {
   scheduler: SchedulerHelpers;
   doctor: Doctor;
+  reRender: (value: boolean) => void;
 }
-export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
+export const CustomEditor = ({ scheduler, doctor, reRender }: CustomEditorProps) => {
   const eventMain = scheduler.edited;
   const { start, end } = scheduler.state;
   const { createEvent, updateEvent } = useScheduleService();
@@ -96,7 +97,8 @@ export const CustomEditor = ({ scheduler, doctor }: CustomEditorProps) => {
             .catch((error) => {
               rej(error);
               enqueueSnackbar('Не удалось создать заявку', { variant: 'error' });
-            });
+            })
+            .finally(() => reRender(false));
         } else if (!eventMain) {
           const payload: CreateScheduleDto = {
             userId: profile?.id,

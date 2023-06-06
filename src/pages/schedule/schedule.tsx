@@ -1,4 +1,4 @@
-import { Container } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 import { SelectChangeEvent } from '@mui/material/Select';
@@ -39,10 +39,12 @@ export const Schedule = () => {
   };
 
   return (
-    <Container>
+    <Container sx={{ minHeight: 706 }}>
       <MultipleSelect list={doctorList} person={person} onChangePerson={handleChange} />
-      {person && forceUpdate && <DateScheduler doctor={person} />}
-      {person && !forceUpdate && <DateScheduler />}
+      {!person && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>Врач не выбран</Box>
+      )}
+      {person && forceUpdate && <DateScheduler doctor={person} reRender={setForceUpdate} />}
     </Container>
   );
 };
