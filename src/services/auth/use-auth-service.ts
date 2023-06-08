@@ -3,6 +3,7 @@ import { VariantType } from 'notistack';
 
 import { api } from '../api/api-adapter';
 import { CreateUserDto, LoginUserRequest } from '../api';
+import { getCookieValueByName } from './cookie';
 
 export type AuthService = {
   authorization: (
@@ -19,8 +20,9 @@ export type AuthService = {
 };
 
 export const useAuthService = () => {
-  const cookie = getCookie('med-cabinet');
-  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(cookie));
+  const authorizedValue = getCookieValueByName('authorized');
+  const authorizedStatus = Boolean(JSON.parse(authorizedValue));
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(authorizedStatus);
   const [isLoading, setIsLoading] = useState(false);
 
   const authorization = async (
@@ -29,18 +31,20 @@ export const useAuthService = () => {
   ) => {
     setIsLoading(true);
 
-    const { data } = await api.user
+    await api.user
       .usersControllerLogin({ loginUserRequest: payload })
-      .catch((e) => e);
-
-    setIsLoading(false);
-
-    if (data?.data?.userId) {
-      setIsLoggedIn(true);
-      onSuccess('Вы успешно авторизовались', 'success');
-    } else {
-      onSuccess('Не удалось авторизоваться', 'error');
-    }
+      .then(({ data }) => {
+        if (data?.data?.userId) {
+          setIsLoggedIn(true);
+          onSuccess('Вы успешно авторизовались', 'success');
+        } else {
+          onSuccess('Не удалось авторизоваться', 'error');
+        }
+      })
+      .catch((e) => e)
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const registration = async (
@@ -49,27 +53,35 @@ export const useAuthService = () => {
   ) => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerCreateUser({ createUserDto: { ...payload } });
-
-    if (data?.data?.userId) {
-      onSuccess('Вы успешно зарегистрированы', 'success');
-    } else {
-      onSuccess('Не удалось зарегистрироваться', 'error');
-    }
-
-    setIsLoading(false);
+    await api.user
+      .usersControllerCreateUser({ createUserDto: { ...payload } })
+      .then(({ data }) => {
+        if (data?.data?.userId) {
+          onSuccess('Вы успешно зарегистрированы', 'success');
+        } else {
+          onSuccess('Не удалось зарегистрироваться', 'error');
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const logout = async (onSuccess?: (msg: string, status: VariantType) => void) => {
-    const { data } = await api.user.usersControllerLogout();
-    setIsLoggedIn(false);
-    deleteCookie();
-
-    if (onSuccess) {
-      onSuccess('Вы вышли из системы', 'success');
-    }
-
-    window.location.reload();
+    await api.user
+      .usersControllerLogout()
+      .then(() => {
+        if (onSuccess) {
+          setIsLoggedIn(false);
+          onSuccess('Вы вышли из системы', 'success');
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   return {
@@ -79,22 +91,4 @@ export const useAuthService = () => {
     isLoggedIn,
     logout,
   };
-};
-
-function getCookie(name: string) {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  if (match) return match[2];
-
-  return undefined;
-}
-
-const deleteCookie = () => {
-  const cookies = document.cookie.split(';');
-
-  for (let i = 0; i < cookies.length; i++) {
-    const cookie = cookies[i];
-    const eqPos = cookie.indexOf('=');
-    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  }
 };

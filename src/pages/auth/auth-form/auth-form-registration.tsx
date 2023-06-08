@@ -5,42 +5,29 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../../services/auth';
 import { StyledBoxForm } from './ui';
+import { FORMAT_DATA_INIT } from './constants';
+import { FormDataType } from './types';
 
 export const AuthFormRegistration = () => {
-  const [emailValue, setEmailValue] = useState('');
-  const [passwordValue, setPasswordValue] = useState('');
-  const [passwordConfirmValue, setPasswordConfirmValue] = useState('');
-
-  const [firstNameValue, setFirstNameValue] = useState('');
-  const [middleNameValue, setMiddleNameValue] = useState('');
-  const [lastNameValue, setLastNameValue] = useState('');
+  const [formData, setFormData] = useState<FormDataType>(FORMAT_DATA_INIT);
+  const [isErrorPass, setIsErrorPass] = useState(false);
 
   const { registration } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
-  const handleChangeEmail = (value: React.ChangeEvent<HTMLInputElement>) => {
-    setEmailValue(value.target.value);
+  const handleResetError = () => {
+    isErrorPass && setIsErrorPass(false);
   };
 
-  const handleChangePassword = (value: React.ChangeEvent<HTMLInputElement>) => {
-    setPasswordValue(value.target.value);
-  };
+  const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
 
-  const handleChangePasswordConfirm = (value: React.ChangeEvent<HTMLInputElement>) => {
-    setPasswordConfirmValue(value.target.value);
-  };
-
-  const handleChangeFirstName = (value: React.ChangeEvent<HTMLInputElement>) => {
-    setFirstNameValue(value.target.value);
-  };
-
-  const handleChangeMiddleName = (value: React.ChangeEvent<HTMLInputElement>) => {
-    setMiddleNameValue(value.target.value);
-  };
-
-  const handleChangeLastName = (value: React.ChangeEvent<HTMLInputElement>) => {
-    setLastNameValue(value.target.value);
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const onSuccessCallback = (msg: string, status: VariantType) => {
@@ -51,72 +38,81 @@ export const AuthFormRegistration = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (passwordValue !== passwordConfirmValue) {
-      console.log('no match');
-    } else {
-      const data = {
-        email: emailValue,
-        password: passwordValue,
-        firstName: firstNameValue,
-        middleName: middleNameValue,
-        lastName: lastNameValue,
-      };
+    const { confirmPassword, ...data } = formData;
 
+    if (confirmPassword !== data.password) {
+      setIsErrorPass(true);
+      enqueueSnackbar('Данные не валидны', { variant: 'error' });
+    } else {
       registration(data, onSuccessCallback);
     }
   };
 
   return (
-    <StyledBoxForm component="form">
+    <StyledBoxForm component="form" onSubmit={handleSubmit}>
       <TextField
         required
         id="email"
         label="Email"
+        name="email"
         defaultValue=""
         size="small"
-        onChange={handleChangeEmail}
+        onChange={handleChangeInput}
       />
       <TextField
         required
-        id="confirm-password"
+        id="first-name"
+        name="firstName"
         label="First name"
         defaultValue=""
         size="small"
-        onChange={handleChangeFirstName}
+        onChange={handleChangeInput}
       />
       <TextField
         required
-        id="confirm-password"
+        id="middle-name"
+        name="middleName"
         label="Middle name"
         defaultValue=""
         size="small"
-        onChange={handleChangeMiddleName}
+        onChange={handleChangeInput}
       />
       <TextField
         required
-        id="confirm-password"
+        id="last-name"
+        name="lastName"
         label="Last name"
         defaultValue=""
         size="small"
-        onChange={handleChangeLastName}
+        onChange={handleChangeInput}
       />
       <TextField
         required
         id="password"
         label="Password"
+        name="password"
         defaultValue=""
         size="small"
-        onChange={handleChangePassword}
+        type="password"
+        autoComplete="off"
+        error={isErrorPass}
+        onChange={handleChangeInput}
+        onClick={handleResetError}
       />
       <TextField
         required
         id="confirm-password"
+        name="confirmPassword"
         label="Confirm Password"
         defaultValue=""
         size="small"
-        onChange={handleChangePasswordConfirm}
+        type="password"
+        autoComplete="off"
+        error={isErrorPass}
+        onChange={handleChangeInput}
+        onClick={handleResetError}
       />
-      <Button variant="contained" sx={{ p: 2 }} onClick={handleSubmit}>
+      <Button variant="contained" sx={{ p: 2 }} type="submit">
         Зарегистрироваться
       </Button>
     </StyledBoxForm>

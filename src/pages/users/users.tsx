@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
+import { enqueueSnackbar, VariantType } from 'notistack';
 
 import { UserTable } from '../../components/user-table';
 import { useUser } from '../../services/user';
@@ -8,7 +9,7 @@ import { ProfilePatch } from '../../services/user/types';
 import { RoleDialog } from './role-dialog';
 
 export const Users = () => {
-  const { profile } = useUser();
+  const { profile, allUsers } = useUser();
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenRoleModal, setIsOpenRoleModal] = useState(false);
   const [profileSelect, setProfileSelect] = useState<Nullable<ProfilePatch>>(null);
@@ -30,11 +31,17 @@ export const Users = () => {
 
   const selectUser = (user: ProfilePatch, modal?: 'role' | 'profile') => {
     setProfileSelect(user);
+
     if (modal === 'role') {
       handleOpenRoleModal();
     } else {
       handleOpenModal();
     }
+  };
+
+  const onSuccessCallback = (msg: string, status: VariantType) => {
+    enqueueSnackbar(msg, { variant: status });
+    allUsers();
   };
 
   return (
@@ -43,14 +50,16 @@ export const Users = () => {
       {profileSelect && (
         <>
           <ProfileDialog
-            profile={profileSelect}
             isOpenModal={isOpenModal}
             onClose={handleCloseModal}
+            onSuccess={onSuccessCallback}
+            selectedProfile={profileSelect}
           />
 
           <RoleDialog
             selectUserId={profileSelect.id}
             currentRole={profileSelect.role}
+            email={profileSelect.email}
             isOpenModal={isOpenRoleModal}
             onClose={handleCloseModal}
           />

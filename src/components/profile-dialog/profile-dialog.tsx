@@ -1,32 +1,33 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { enqueueSnackbar, VariantType } from 'notistack';
+import { VariantType } from 'notistack';
 
 import { ProfilePatch } from '../../services/user/types';
 import { useUser } from '../../services/user';
-import { UserProfileForm } from '../user-profile-form';
+import { UserProfileForm } from './user-profile-form';
+import { initProfileForm } from './consts';
 
 type Props = {
-  profile: ProfilePatch;
   isOpenModal: boolean;
   onClose: () => void;
+  onSuccess: (msg: string, status: VariantType) => void;
+  selectedProfile?: ProfilePatch;
 };
 
-export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
-  const { updateProfile, allUsers, removeById } = useUser();
-  const [profileForm, setProfileForm] = useState<ProfilePatch>(profile);
+export const ProfileDialog = ({ isOpenModal, onClose, onSuccess, selectedProfile }: Props) => {
+  const { updateProfile, removeById, profile } = useUser();
+  const [profileForm, setProfileForm] = useState<Nullable<ProfilePatch>>(
+    initProfileForm(selectedProfile || profile),
+  );
 
   useEffect(() => {
-    setProfileForm(profile);
-  }, [profile]);
+    setProfileForm(selectedProfile || profile);
+  }, [selectedProfile, profile]);
 
-  const onSuccessCallback = (msg: string, status: VariantType) => {
-    enqueueSnackbar(msg, { variant: status });
-    allUsers();
-  };
+  if (!profileForm) return null;
 
   const handleChangeProfile = (name?: string, value?: string) => {
-    if (!profileForm || !name || !value) return null;
+    if (!profileForm || !name) return null;
 
     setProfileForm({
       ...profileForm,
@@ -37,19 +38,22 @@ export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
   const handleSubmit = () => {
     if (!profileForm) return null;
 
-    updateProfile(profileForm, onSuccessCallback, profile.id);
-    onClose();
+    updateProfile(profileForm, onSuccess);
+    handleCloseModal();
   };
 
   const handleRemove = () => {
-    onClose();
     removeById(profileForm.id);
+    handleCloseModal();
   };
 
-  if (!profileForm) return null;
+  const handleCloseModal = () => {
+    // setProfileForm(selectedProfile || profile);
+    onClose();
+  };
 
   return (
-    <Dialog open={isOpenModal} onClose={onClose}>
+    <Dialog open={isOpenModal} onClose={handleCloseModal}>
       <DialogTitle>Редактирование</DialogTitle>
       <DialogContent>
         <UserProfileForm profile={profileForm} onChange={handleChangeProfile} />
@@ -57,21 +61,22 @@ export const ProfileDialog = ({ profile, isOpenModal, onClose }: Props) => {
       <DialogActions
         sx={{
           display: 'flex',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           gap: 1,
-          minWidth: 300,
-          boxSizing: 'border-box',
+          padding: '12px 30px 28px',
         }}
       >
         <Button onClick={handleSubmit} variant="contained" color="success">
           Сохранить
         </Button>
-        <Button onClick={onClose} variant="contained">
+        <Button onClick={handleCloseModal} variant="outlined">
           Отмена
         </Button>
-        <Button onClick={handleRemove} variant="contained" color="error">
-          Удалить
-        </Button>
+        {selectedProfile && (
+          <Button onClick={handleRemove} variant="outlined" color="error">
+            Удалить
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   );

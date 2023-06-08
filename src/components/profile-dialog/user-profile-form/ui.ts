@@ -5,7 +5,8 @@ export const StyledBoxForm = styled(Box)`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 100%;
+  max-width: 100%;
+  width: 420px;
   box-sizing: border-box;
   background-color: var(--main-form);
   padding: 8px;

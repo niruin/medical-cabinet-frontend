@@ -11,7 +11,6 @@ export type UserService = {
   updateProfile: (
     data: ProfilePatch,
     onSuccess: (msg: string, status: VariantType) => void,
-    userIdToEdit?: number,
   ) => void;
   changeRole: (
     data: ChangeRoleUserDto,
@@ -33,44 +32,75 @@ export const useUserService = (): UserService => {
   const getProfile = async () => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerGetProfile();
-    setProfile(data.data);
-    setIsLoading(false);
+    await api.user
+      .usersControllerGetProfile()
+      .then(({ data }) => {
+        setProfile(data.data);
+      })
+      .catch((e) => {
+        console.log('error', e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const updateProfile = async (
     payload: ProfilePatch,
     onSuccess: (msg: string, status: VariantType) => void,
-    userIdToEdit?: number,
   ) => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerUpdate({
-      userChangeRequest: payload,
-      userIdToEdit: String(userIdToEdit),
-    });
-    setIsLoading(false);
-    onSuccess('Профиль обновлен', 'success');
+    await api.user
+      .usersControllerUpdate({
+        userChangeRequest: payload,
+      })
+      .then(() => {
+        onSuccess('Профиль обновлен', 'success');
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const allUsers = async () => {
     setIsLoading(true);
-    const { data } = await api.user.usersControllerGetUsersAll();
-    setUsers(data.data);
-    setIsLoading(false);
+    await api.user
+      .usersControllerGetUsersAll()
+      .then(({ data }) => {
+        setUsers(
+          data.data.sort(function (a, b) {
+            return a.id - b.id;
+          }),
+        );
+      })
+      .catch((e) => {
+        console.log('error', e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const removeById = async (id: number) => {
     setIsLoading(true);
 
-    const { data } = await api.user.usersControllerRemove({ deleteUserDto: { id } });
-    setIsLoading(false);
-
-    if (profile?.id === id) {
-      logout();
-    } else {
-      allUsers();
-    }
+    await api.user
+      .usersControllerRemove({ deleteUserDto: { id } })
+      .then(() => {
+        if (profile?.id === id) {
+          logout();
+          location.href = '/login';
+        } else {
+          allUsers();
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const changeRole = async (
@@ -78,9 +108,17 @@ export const useUserService = (): UserService => {
     onSuccess: (msg: string, status: VariantType) => void,
   ) => {
     setIsLoading(true);
-    const { data } = await api.user.usersControllerChangeRole({ changeRoleUserDto: payload });
-    setIsLoading(false);
-    onSuccess('Профиль обновлен', 'success');
+    await api.user
+      .usersControllerChangeRole({ changeRoleUserDto: payload })
+      .then(() => {
+        onSuccess('Профиль обновлен', 'success');
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return {

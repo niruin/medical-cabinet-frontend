@@ -14,7 +14,10 @@ class Api {
   }
 
   private logout = () => {
-    // location.reload();
+    if (window.location.pathname !== '/login') {
+      this.user.usersControllerLogout();
+      window.location.href = '/login';
+    }
   };
 
   private setDefault = () => {
@@ -27,22 +30,7 @@ class Api {
         return config;
       },
       async (error) => {
-        const refresh = localStorage.getItem('refresh');
-        const originalRequest = error.config;
-        if (
-          refresh &&
-          error?.response?.status === 403 &&
-          error?.response?.data.code === 'token_not_valid'
-        ) {
-          originalRequest._isRetry = true;
-
-          try {
-            return globalAxios.request(originalRequest);
-          } catch (e) {
-            this.logout();
-          }
-        }
-        if (!refresh && error.response?.status === 401) {
+        if (error.response?.status === 401) {
           this.logout();
         }
 

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -20,11 +21,12 @@ import { ChangeRoleUserDto } from '../../../services/api';
 type Props = {
   selectUserId: number;
   currentRole: string;
+  email: string;
   isOpenModal: boolean;
   onClose: () => void;
 };
 
-export const RoleDialog = ({ selectUserId, currentRole, isOpenModal, onClose }: Props) => {
+export const RoleDialog = ({ selectUserId, currentRole, email, isOpenModal, onClose }: Props) => {
   const [formRole, setFormRole] = useState(currentRole);
   const { allUsers, changeRole } = useUser();
 
@@ -53,7 +55,10 @@ export const RoleDialog = ({ selectUserId, currentRole, isOpenModal, onClose }: 
 
   return (
     <Dialog open={isOpenModal} onClose={onClose}>
-      <DialogTitle>Сменить Роль</DialogTitle>
+      <DialogTitle>Сменить роль</DialogTitle>
+      <Box sx={{ padding: '0px 24px' }}>
+        <b>{email}</b>
+      </Box>
       <DialogContent>
         <FormControl fullWidth sx={{ mt: 1 }}>
           <InputLabel id="demo-simple-select-label">Роль</InputLabel>
@@ -76,16 +81,15 @@ export const RoleDialog = ({ selectUserId, currentRole, isOpenModal, onClose }: 
       <DialogActions
         sx={{
           display: 'flex',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           gap: 1,
-          minWidth: 300,
-          boxSizing: 'border-box',
+          padding: '12px 22px 24px',
         }}
       >
         <Button onClick={handleSubmit} variant="contained" color="success">
           Сохранить
         </Button>
-        <Button onClick={onClose} variant="contained">
+        <Button onClick={onClose} variant="outlined">
           Отмена
         </Button>
       </DialogActions>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextField } from '@mui/material';
 import { enqueueSnackbar, VariantType } from 'notistack';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../../services/auth';
 import { StyledBoxForm } from './ui';
@@ -10,6 +11,7 @@ export const AuthFormLogin = () => {
   const [passwordValue, setPasswordValue] = useState('');
 
   const { authorization } = useAuth();
+  const navigate = useNavigate();
 
   const handleChangeEmail = (value: React.ChangeEvent<HTMLInputElement>) => {
     setEmailValue(value.target.value);
@@ -21,6 +23,8 @@ export const AuthFormLogin = () => {
 
   const onSuccessCallback = (msg: string, status: VariantType) => {
     enqueueSnackbar(msg, { variant: status });
+
+    navigate({ pathname: '/profile' });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -33,7 +37,7 @@ export const AuthFormLogin = () => {
   };
 
   return (
-    <StyledBoxForm component="form">
+    <StyledBoxForm component="form" onSubmit={handleSubmit}>
       <TextField
         required
         id="email"
@@ -48,9 +52,11 @@ export const AuthFormLogin = () => {
         label="Password"
         defaultValue=""
         size="small"
+        type="password"
+        autoComplete="on"
         onChange={handleChangePassword}
       />
-      <Button variant="contained" sx={{ p: 2 }} onClick={handleSubmit}>
+      <Button variant="contained" sx={{ p: 2 }} type="submit">
         Войти
       </Button>
     </StyledBoxForm>

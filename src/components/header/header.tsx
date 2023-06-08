@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import { enqueueSnackbar, VariantType } from 'notistack';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../services/auth';
 import { StyledBox } from './ui';
@@ -9,6 +10,7 @@ import { useUser } from '../../services/user';
 export const Header = () => {
   const { logout } = useAuth();
   const { getProfile } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getProfile();
@@ -16,6 +18,7 @@ export const Header = () => {
 
   const onSuccessCallback = (msg: string, status: VariantType) => {
     enqueueSnackbar(msg, { variant: status });
+    navigate({ pathname: '/login' });
   };
 
   const handleLogout = () => {

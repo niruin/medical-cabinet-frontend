@@ -1,1 +1,0 @@
-export { Visits } from './visits';
